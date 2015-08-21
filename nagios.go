@@ -28,7 +28,7 @@ type ExecResult struct {
 	Output     string
 }
 
-// Debugf is a helper function for debug logging if mainCfgSection["debug"] is set
+// Debugf is a helper function for debug logging if Debug is true
 func Debugf(s string) {
 	if Debug != false {
 		fmt.Println("DEBUG " + fmt.Sprint(s))
@@ -69,6 +69,10 @@ func NagiosExit(nr NagiosResult) {
 	os.Exit(exitCode)
 }
 
+// ExecuteCommand executes a shell command and provides the stdout and stderr output combined and the exit code.
+// First arg is the command to execute as a simple string.
+// Second arg is a timeout parameter as a int after which to kill the command and return.
+// Third arg is a bool flag if the command is allowed to fail or not.
 func ExecuteCommand(command string, timeout int, allowFail bool) ExecResult {
 	Debugf("Executing " + command)
 	parts := strings.SplitN(command, " ", 2)
