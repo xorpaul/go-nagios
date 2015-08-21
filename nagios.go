@@ -12,64 +12,64 @@ import (
 )
 
 var (
-	debug     bool
+	Debug     bool
 	buildtime string
 )
 
 type NagiosResult struct {
-	exitCode  int
-	text      string
-	perfdata  string
-	multiline []string
+	ExitCode  int
+	Text      string
+	Perfdata  string
+	Multiline []string
 }
 
 type ExecResult struct {
-	returnCode int
-	output     string
+	ReturnCode int
+	Output     string
 }
 
 // Debugf is a helper function for debug logging if mainCfgSection["debug"] is set
 func Debugf(s string) {
-	if debug != false {
+	if Debug != false {
 		fmt.Println("DEBUG " + fmt.Sprint(s))
 	}
 }
 
-// nagiosExit uses the NagiosResult struct to output Nagios plugin compatible output and exit codes
-func nagiosExit(nr NagiosResult) {
-	text := nr.text
-	exitCode := nr.exitCode
+// NagiosExit uses the NagiosResult struct to output Nagios plugin compatible output and exit codes
+func NagiosExit(nr NagiosResult) {
+	text := nr.Text
+	exitCode := nr.ExitCode
 	switch {
-	case nr.exitCode == 0:
-		text = "OK: " + nr.text
-		exitCode = nr.exitCode
-	case nr.exitCode == 1:
-		text = "WARNING: " + nr.text
-		exitCode = nr.exitCode
-	case nr.exitCode == 2:
-		text = "CRITICAL: " + nr.text
-		exitCode = nr.exitCode
-	case nr.exitCode == 3:
-		text = "UNKNOWN: " + nr.text
-		exitCode = nr.exitCode
+	case nr.ExitCode == 0:
+		text = "OK: " + nr.Text
+		exitCode = nr.ExitCode
+	case nr.ExitCode == 1:
+		text = "WARNING: " + nr.Text
+		exitCode = nr.ExitCode
+	case nr.ExitCode == 2:
+		text = "CRITICAL: " + nr.Text
+		exitCode = nr.ExitCode
+	case nr.ExitCode == 3:
+		text = "UNKNOWN: " + nr.Text
+		exitCode = nr.ExitCode
 	default:
-		text = "UNKNOWN: Exit code '" + string(nr.exitCode) + "'undefined :" + nr.text
+		text = "UNKNOWN: Exit code '" + string(nr.ExitCode) + "'undefined :" + nr.Text
 		exitCode = 3
 	}
 
-	if len(nr.multiline) > 0 {
+	if len(nr.Multiline) > 0 {
 		multiline := ""
-		for _, l := range nr.multiline {
+		for _, l := range nr.Multiline {
 			multiline = multiline + l + "\n"
 		}
-		fmt.Printf("%s|%s\n%s\n", text, nr.perfdata, multiline)
+		fmt.Printf("%s|%s\n%s\n", text, nr.Perfdata, multiline)
 	} else {
-		fmt.Printf("%s|%s\n", text, nr.perfdata)
+		fmt.Printf("%s|%s\n", text, nr.Perfdata)
 	}
 	os.Exit(exitCode)
 }
 
-func executeCommand(command string, timeout int, allowFail bool) ExecResult {
+func ExecuteCommand(command string, timeout int, allowFail bool) ExecResult {
 	Debugf("Executing " + command)
 	parts := strings.SplitN(command, " ", 2)
 	cmd := parts[0]
@@ -89,7 +89,7 @@ func executeCommand(command string, timeout int, allowFail bool) ExecResult {
 	duration := time.Since(before).Seconds()
 	er := ExecResult{0, string(out)}
 	if msg, ok := err.(*exec.ExitError); ok { // there is error code
-		er.returnCode = msg.Sys().(syscall.WaitStatus).ExitStatus()
+		er.ReturnCode = msg.Sys().(syscall.WaitStatus).ExitStatus()
 	}
 	Debugf("Executing " + command + " took " + strconv.FormatFloat(duration, 'f', 5, 64) + "s")
 	if err != nil && !allowFail {
