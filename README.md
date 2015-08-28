@@ -4,7 +4,7 @@ Golang package for Nagios plugins
 ## Usage
 
 ```
-import "github.com/kballard/go-shellquote"
+import "github.com/xorpaul/go-nagios"
 ```
 
 ```
